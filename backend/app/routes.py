@@ -34,9 +34,11 @@ def echo(ws):
                 pull_image(data)
                 ws.send(json.dumps({"type": type, "data": data}))
             elif type == "remove-image":
-                remove_image()
+                remove_image(data)
             elif type == "run-image":
                 run_image(data["imageName"], data["command"], data["ports"])
+            elif type == "stop-container":
+                stop_container(data)
         except Exception as e:
             print(e)
 

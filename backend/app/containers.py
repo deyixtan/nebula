@@ -27,6 +27,10 @@ def run_image(imageName, command, ports, detach=True, tty=True):
     __run_image(imageName, command, ports, detach, tty)
 
 
+def stop_container(containerName, force=True):
+    __stop_container(containerName, force)
+
+
 ##########################################################
 # helpers functions
 ##########################################################
@@ -67,10 +71,45 @@ def __pull_image(repository):
 
 
 def __remove_image(imageName, force):
-    docker_engine.images.remove(imageName, force)
+    docker_engine.images.remove(imageName, force=force)
 
 
 def __run_image(imageName, command, ports, detach, tty):
     docker_engine.containers.run(
         imageName, command, ports=ports, detach=detach, tty=tty
     )
+
+
+def __stop_container(containerName, force):
+    containers = docker_engine.containers.list()
+    for container in containers:
+        if container.name == containerName:
+            print(container.name)
+            container.stop()
+            return True
+    return False
+
+
+#
+def get_docker_logs():
+    return (
+        docker_engine.containers.get("charming_blackwell")
+        .logs(
+            stdout=True,
+            stderr=True,
+            stream=False,
+            timestamps=False,
+            tail="all",
+            since=None,
+            follow=None,
+            until=None,
+        )
+        .decode()
+    )
+
+
+#
+
+# TODO:
+# - Docker pull (takes in repo path)
+# - Upload archive to tmp directory, unzip, build Dockerfile
