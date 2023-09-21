@@ -27,8 +27,16 @@ def run_image(imageName, command, ports, detach=True, tty=True):
     __run_image(imageName, command, ports, detach, tty)
 
 
-def stop_container(containerName, force=True):
-    __stop_container(containerName, force)
+def stop_container(containerName):
+    __stop_container(containerName)
+
+
+def pause_container(containerName):
+    __pause_container(containerName)
+
+
+def unpause_container(containerName):
+    __unpause_container(containerName)
 
 
 ##########################################################
@@ -59,6 +67,7 @@ def __get_docker_containers():
                 "containerId": x.id,
                 "containerImage": x.image.tags[0] if len(x.image.tags) > 0 else "",
                 "containerName": x.name,
+                "containerPorts": x.attrs["HostConfig"]["PortBindings"],
                 "containerStatus": x.status,
             },
             containers,
@@ -80,36 +89,28 @@ def __run_image(imageName, command, ports, detach, tty):
     )
 
 
-def __stop_container(containerName, force):
+def __stop_container(containerName):
     containers = docker_engine.containers.list()
     for container in containers:
         if container.name == containerName:
-            print(container.name)
             container.stop()
             return True
     return False
 
 
-#
-def get_docker_logs():
-    return (
-        docker_engine.containers.get("charming_blackwell")
-        .logs(
-            stdout=True,
-            stderr=True,
-            stream=False,
-            timestamps=False,
-            tail="all",
-            since=None,
-            follow=None,
-            until=None,
-        )
-        .decode()
-    )
+def __pause_container(containerName):
+    containers = docker_engine.containers.list()
+    for container in containers:
+        if container.name == containerName:
+            container.pause()
+            return True
+    return False
 
 
-#
-
-# TODO:
-# - Docker pull (takes in repo path)
-# - Upload archive to tmp directory, unzip, build Dockerfile
+def __unpause_container(containerName):
+    containers = docker_engine.containers.list()
+    for container in containers:
+        if container.name == containerName:
+            container.unpause()
+            return True
+    return False

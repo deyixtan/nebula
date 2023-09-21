@@ -39,6 +39,10 @@ def echo(ws):
                 run_image(data["imageName"], data["command"], data["ports"])
             elif type == "stop-container":
                 stop_container(data)
+            elif type == "pause-container":
+                pause_container(data)
+            elif type == "unpause-container":
+                unpause_container(data)
         except Exception as e:
             print(e)
 

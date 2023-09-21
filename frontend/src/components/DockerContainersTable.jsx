@@ -8,7 +8,11 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { StopCircleOutlined } from "@mui/icons-material";
+import {
+  PauseCircleOutlineOutlined,
+  PlayCircleOutline,
+  StopCircleOutlined,
+} from "@mui/icons-material";
 import useAuth from "../hooks/useAuth";
 
 const DockerContainersTable = ({ containerList }) => {
@@ -23,6 +27,14 @@ const DockerContainersTable = ({ containerList }) => {
     socket.send(craftMessage("stop-container", containerName));
   };
 
+  const handlePauseContainer = (containerName) => {
+    socket.send(craftMessage("pause-container", containerName));
+  };
+
+  const handleUnpauseContainer = (containerName) => {
+    socket.send(craftMessage("unpause-container", containerName));
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -31,6 +43,8 @@ const DockerContainersTable = ({ containerList }) => {
             <TableCell>ID</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Image</TableCell>
+            <TableCell>Ports</TableCell>
+            <TableCell>Status</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -40,12 +54,31 @@ const DockerContainersTable = ({ containerList }) => {
               <TableCell>{container.containerId}</TableCell>
               <TableCell>{container.containerName}</TableCell>
               <TableCell>{container.containerImage}</TableCell>
+              <TableCell>{JSON.stringify(container.containerPorts)}</TableCell>
+              <TableCell>{container.containerStatus}</TableCell>
               <TableCell>
                 <IconButton
                   onClick={() => handleStopContainer(container.containerName)}
                 >
                   <StopCircleOutlined />
                 </IconButton>
+                {container.containerStatus === "paused" ? (
+                  <IconButton
+                    onClick={() =>
+                      handleUnpauseContainer(container.containerName)
+                    }
+                  >
+                    <PlayCircleOutline />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    onClick={() =>
+                      handlePauseContainer(container.containerName)
+                    }
+                  >
+                    <PauseCircleOutlineOutlined />
+                  </IconButton>
+                )}
               </TableCell>
             </TableRow>
           ))}
