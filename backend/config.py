@@ -10,6 +10,8 @@ class Config:
     ACCESS_TOKEN_KEY = "12345"
     REFRESH_TOKEN_KEY = "67890"
 
+    SOCK_SERVER_OPTIONS = {"ping_interval": 25}
+
     SQLALCHEMY_DATABASE_URI = r"sqlite:///./db.sqlite"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True  # in prod should be false

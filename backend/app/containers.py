@@ -68,3 +68,9 @@ def __pull_image(repository):
 
 def __remove_image(imageName, force):
     docker_engine.images.remove(imageName, force)
+
+
+def __run_image(imageName, command, ports, detach, tty):
+    docker_engine.containers.run(
+        imageName, command, ports=ports, detach=detach, tty=tty
+    )
