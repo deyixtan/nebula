@@ -19,6 +19,10 @@ def pull_image(repository):
     return True
 
 
+def remove_image(imageName, force=True):
+    __remove_image(imageName, force)
+
+
 ##########################################################
 # helpers functions
 ##########################################################
@@ -56,3 +60,7 @@ def __get_docker_containers():
 
 def __pull_image(repository):
     docker_engine.images.pull(repository)
+
+
+def __remove_image(imageName, force):
+    docker_engine.images.remove(imageName, force)

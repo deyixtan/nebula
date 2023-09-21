@@ -66,18 +66,16 @@ const IndexPage = () => {
   return (
     <BasicLayout>
       <Box
-        width="85%"
-        minWidth="85%"
-        maxWidth="85%"
+        width="100%"
+        minWidth="100%"
+        maxWidth="100%"
         height="85%"
         minHeight="85%"
         maxHeight="85%"
-        border="2px solid black"
-        borderRadius="15px"
       >
         <TabContext value={tabValue}>
           <Box borderBottom={1} borderColor="divider">
-            <TabList onChange={handleTabChange}>
+            <TabList variant="fullWidth" onChange={handleTabChange}>
               <Tab label="Images" value="1" />
               <Tab label="Containers" value="2" />
               <Tab label="VNC" value="3" />

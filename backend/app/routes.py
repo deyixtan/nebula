@@ -32,6 +32,8 @@ def echo(ws):
         elif type == "pull-image":
             pull_image(data)
             ws.send(json.dumps({"type": type, "data": data}))
+        elif type == "remove-image":
+            remove_image(data)
 
 
 @bp.route("/authorize/<provider>")
