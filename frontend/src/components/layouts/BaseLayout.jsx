@@ -25,7 +25,6 @@ export const BaseLayout = (props) => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        bgcolor="#52b785"
         width="100%"
         minWidth="100%"
         maxWidth="100%"

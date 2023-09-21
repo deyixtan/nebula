@@ -1,5 +1,6 @@
 import useAuth from "./useAuth.jsx";
 import useAxiosPublic from "./useAxiosPublic";
+import useWebSocket from "./useWebSocket";
 import { BACKEND_REFRESH_URL } from "../config";
 
 const useRefreshToken = () => {
@@ -11,10 +12,13 @@ const useRefreshToken = () => {
 
     const { accessToken } = response.data;
 
+    const socket = useWebSocket();
+
     setAuth((prev) => {
       return {
         ...prev,
         accessToken,
+        socket,
       };
     });
     return accessToken;
