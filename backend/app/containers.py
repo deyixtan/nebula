@@ -23,6 +23,10 @@ def remove_image(imageName, force=True):
     __remove_image(imageName, force)
 
 
+def run_image(imageName, command, ports, detach=True, tty=True):
+    __run_image(imageName, command, ports, detach, tty)
+
+
 ##########################################################
 # helpers functions
 ##########################################################

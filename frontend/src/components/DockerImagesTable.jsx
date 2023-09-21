@@ -8,7 +8,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline, PlayCircleOutline } from "@mui/icons-material";
 import useAuth from "../hooks/useAuth";
 
 const DockerImagesTable = ({ imageList }) => {
@@ -21,6 +21,28 @@ const DockerImagesTable = ({ imageList }) => {
 
   const handleRemoveImage = (imageName) => {
     socket.send(craftMessage("remove-image", imageName));
+  };
+
+  const handleRunImage = (imageName) => {
+    // TODO: use MUI's dialog boxes
+    const command = prompt(
+      "Please enter command to execute in container:",
+      "/bin/sh"
+    );
+    const ports = prompt(
+      "Please enter port binding in JSON format:",
+      '{"<container port>/tcp": <host port>}'
+    );
+
+    try {
+      socket.send(
+        craftMessage("run-image", {
+          imageName,
+          command,
+          ports: JSON.parse(ports),
+        })
+      );
+    } catch {}
   };
 
   return (
@@ -39,8 +61,11 @@ const DockerImagesTable = ({ imageList }) => {
               <TableCell>{image.imageId}</TableCell>
               <TableCell>{image.imageName}</TableCell>
               <TableCell>
-                <IconButton onClick={() => handleRemoveImage(image.imageId)}>
+                <IconButton onClick={() => handleRemoveImage(image.imageName)}>
                   <DeleteOutline />
+                </IconButton>
+                <IconButton onClick={() => handleRunImage(image.imageName)}>
+                  <PlayCircleOutline />
                 </IconButton>
               </TableCell>
             </TableRow>

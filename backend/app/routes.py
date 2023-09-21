@@ -33,7 +33,9 @@ def echo(ws):
             pull_image(data)
             ws.send(json.dumps({"type": type, "data": data}))
         elif type == "remove-image":
-            remove_image(data)
+            remove_image()
+        elif type == "run-image":
+            run_image(data["imageName"], data["command"], data["ports"])
 
 
 @bp.route("/authorize/<provider>")
