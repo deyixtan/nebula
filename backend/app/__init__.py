@@ -1,10 +1,12 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_sock import Sock
+from flask_sqlalchemy import SQLAlchemy
 from redis import Redis
 from config import Config
 
 db = SQLAlchemy()
+sock = Sock()
 
 
 def create_app(config_class=Config):
@@ -24,6 +26,9 @@ def create_app(config_class=Config):
         host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=0
     )
     app.redis.flushall()
+
+    # websocket-related
+    sock.init_app(app)
 
     # setting up routes
     from app.routes import bp

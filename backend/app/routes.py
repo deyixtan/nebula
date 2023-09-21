@@ -1,3 +1,4 @@
+import json
 import requests
 from base64 import b64encode
 from urllib.parse import urlencode
@@ -13,10 +14,21 @@ from flask import (
     url_for,
 )
 from sqlalchemy import and_
-from app import db
+from app import db, sock
+from app.containers import *
 from app.models import User
 
 bp = Blueprint("bp", __name__)
+
+
+@sock.route("/ws")
+def echo(ws):
+    while True:
+        data = ws.receive()
+        if data == "image-list":
+            ws.send(json.dumps({"type": data, "data": get_docker_images()}))
+        elif data == "container-list":
+            ws.send(json.dumps({"type": data, "data": get_docker_containers()}))
 
 
 @bp.route("/authorize/<provider>")
