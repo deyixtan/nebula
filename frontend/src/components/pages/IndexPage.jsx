@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Box, Button, Stack, Tab, TextField } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Rnd } from "react-rnd";
+import { VncScreen } from "react-vnc";
 import DockerContainersTable from "../DockerContainersTable.jsx";
 import DockerImagesTable from "../DockerImagesTable.jsx";
 import BasicLayout from "../layouts/BasicLayout";
@@ -15,6 +17,8 @@ const IndexPage = () => {
   const [tabValue, setTabValue] = useState("1");
   const [pullRepository, setPullRepository] = useState("");
   const [isPullingImage, setPullingImage] = useState(false);
+  const [vncUrl, setVncUrl] = useState("");
+  const vncUrlRef = useRef(null);
 
   const craftMessage = (type, data) => {
     return JSON.stringify({ type, data });
@@ -31,6 +35,10 @@ const IndexPage = () => {
   const handleClickPullRepository = () => {
     setPullingImage(true);
     socket.send(craftMessage("pull-image", pullRepository));
+  };
+
+  const handleClickVncConnect = () => {
+    setVncUrl(vncUrlRef.current.value);
   };
 
   useEffect(() => {
@@ -72,6 +80,7 @@ const IndexPage = () => {
             <TabList onChange={handleTabChange}>
               <Tab label="Images" value="1" />
               <Tab label="Containers" value="2" />
+              <Tab label="VNC" value="3" />
             </TabList>
           </Box>
           <TabPanel value="1">
@@ -96,6 +105,41 @@ const IndexPage = () => {
           <TabPanel value="2">
             <DockerContainersTable containerList={containerList} />
           </TabPanel>
+          <TabPanel value="3">
+            <Stack spacing="10px" marginBottom="50px">
+              <TextField variant="outlined" inputRef={vncUrlRef} />
+              <Button
+                variant="contained"
+                size="lg"
+                onClick={() => {
+                  handleClickVncConnect();
+                }}
+              >
+                Connect
+              </Button>
+            </Stack>
+          </TabPanel>
+          <Rnd
+            default={{
+              x: 0,
+              y: 0,
+              width: 320,
+              height: 200,
+            }}
+            bounds="parent"
+          >
+            {vncUrl !== "" && (
+              <VncScreen
+                url={vncUrl}
+                scaleViewport
+                background="#000000"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            )}
+          </Rnd>
         </TabContext>
       </Box>
     </BasicLayout>
