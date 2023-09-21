@@ -18,7 +18,7 @@ const IndexPage = () => {
   const [pullRepository, setPullRepository] = useState("");
   const [isPullingImage, setPullingImage] = useState(false);
   const [vncUrl, setVncUrl] = useState("");
-  const vncUrlRef = useRef(null);
+  const vncUrlTextFieldRef = useRef(null);
 
   const craftMessage = (type, data) => {
     return JSON.stringify({ type, data });
@@ -38,7 +38,11 @@ const IndexPage = () => {
   };
 
   const handleClickVncConnect = () => {
-    setVncUrl(vncUrlRef.current.value);
+    setVncUrl(vncUrlTextFieldRef.current.value);
+  };
+
+  const handleClickVncDisconnect = () => {
+    setVncUrl("");
   };
 
   useEffect(() => {
@@ -105,28 +109,39 @@ const IndexPage = () => {
           </TabPanel>
           <TabPanel value="3">
             <Stack spacing="10px" marginBottom="50px">
-              <TextField variant="outlined" inputRef={vncUrlRef} />
+              <TextField variant="outlined" inputRef={vncUrlTextFieldRef} />
               <Button
                 variant="contained"
                 size="lg"
                 onClick={() => {
                   handleClickVncConnect();
                 }}
+                disabled={vncUrl !== ""}
               >
                 Connect
               </Button>
+              <Button
+                variant="outlined"
+                size="lg"
+                onClick={() => {
+                  handleClickVncDisconnect();
+                }}
+                disabled={vncUrl === ""}
+              >
+                Disconnect
+              </Button>
             </Stack>
           </TabPanel>
-          <Rnd
-            default={{
-              x: 0,
-              y: 0,
-              width: 320,
-              height: 200,
-            }}
-            bounds="parent"
-          >
-            {vncUrl !== "" && (
+          {vncUrl !== "" && (
+            <Rnd
+              default={{
+                x: 0,
+                y: 0,
+                width: 320,
+                height: 200,
+              }}
+              bounds="parent"
+            >
               <VncScreen
                 url={vncUrl}
                 scaleViewport
@@ -136,8 +151,8 @@ const IndexPage = () => {
                   height: "100%",
                 }}
               />
-            )}
-          </Rnd>
+            </Rnd>
+          )}
         </TabContext>
       </Box>
     </BasicLayout>
