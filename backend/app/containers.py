@@ -37,7 +37,7 @@ def _get_docker_containers():
         map(
             lambda x: {
                 "containerId": x.id,
-                "containerImage": x.tags[0] if len(x.tags) > 0 else "",
+                "containerImage": x.image.tags[0] if len(x.image.tags) > 0 else "",
                 "containerName": x.name,
                 "containerStatus": x.status,
             },
