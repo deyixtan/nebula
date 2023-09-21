@@ -24,11 +24,14 @@ bp = Blueprint("bp", __name__)
 @sock.route("/ws")
 def echo(ws):
     while True:
-        data = ws.receive()
-        if data == "image-list":
-            ws.send(json.dumps({"type": data, "data": get_docker_images()}))
-        elif data == "container-list":
-            ws.send(json.dumps({"type": data, "data": get_docker_containers()}))
+        type, data = json.loads(ws.receive()).values()
+        if type == "image-list":
+            ws.send(json.dumps({"type": type, "data": get_docker_images()}))
+        elif type == "container-list":
+            ws.send(json.dumps({"type": type, "data": get_docker_containers()}))
+        elif type == "pull-image":
+            pull_image(data)
+            ws.send(json.dumps({"type": type, "data": data}))
 
 
 @bp.route("/authorize/<provider>")

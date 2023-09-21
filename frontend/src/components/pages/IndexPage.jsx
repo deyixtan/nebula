@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Tab } from "@mui/material";
+import { Box, Button, Stack, Tab, TextField } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import DockerContainersTable from "../DockerContainersTable.jsx";
 import DockerImagesTable from "../DockerImagesTable.jsx";
@@ -13,25 +13,47 @@ const IndexPage = () => {
   const [imageList, setImageList] = useState([]);
   const [containerList, setContainerList] = useState([]);
   const [tabValue, setTabValue] = useState("1");
+  const [pullRepository, setPullRepository] = useState("");
+  const [isPullingImage, setPullingImage] = useState(false);
+
+  const craftMessage = (type, data) => {
+    return JSON.stringify({ type, data });
+  };
+
+  const handleTabChange = (event, newTabValue) => {
+    setTabValue(newTabValue);
+  };
+
+  const handleChangePullRepository = (event) => {
+    setPullRepository(event.target.value);
+  };
+
+  const handleClickPullRepository = () => {
+    setPullingImage(true);
+    socket.send(craftMessage("pull-image", pullRepository));
+  };
 
   useEffect(() => {
     socket.handlerChain["index-page"] = (message) => {
       const { type, data } = JSON.parse(message);
       if (type === "image-list") setImageList(data);
       else if (type === "container-list") setContainerList(data);
+      else if (type === "pull-image") setPullingImage(false);
     };
 
-    setInterval(() => socket.send("image-list"), FETCH_IMAGES_DELAY);
-    setInterval(() => socket.send("container-list"), FETCH_CONTAINERS_DELAY);
+    setInterval(
+      () => socket.send(craftMessage("image-list", "")),
+      FETCH_IMAGES_DELAY
+    );
+    setInterval(
+      () => socket.send(craftMessage("container-list", "")),
+      FETCH_CONTAINERS_DELAY
+    );
 
     return () => {
       delete socket.handlerChain["index-page"];
     };
   }, []);
-
-  const handleTabChange = (event, newTabValue) => {
-    setTabValue(newTabValue);
-  };
 
   return (
     <BasicLayout>
@@ -53,6 +75,22 @@ const IndexPage = () => {
             </TabList>
           </Box>
           <TabPanel value="1">
+            <Stack spacing="10px" marginBottom="50px">
+              <TextField
+                variant="outlined"
+                onChange={handleChangePullRepository}
+              />
+              <Button
+                variant="contained"
+                size="lg"
+                onClick={() => {
+                  handleClickPullRepository();
+                }}
+                disabled={isPullingImage === true}
+              >
+                Pull Image
+              </Button>
+            </Stack>
             <DockerImagesTable imageList={imageList} />
           </TabPanel>
           <TabPanel value="2">

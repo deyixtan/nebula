@@ -4,17 +4,25 @@ docker_engine = from_env()
 
 
 def get_docker_images():
-    return _get_docker_images()
+    return __get_docker_images()
 
 
 def get_docker_containers():
-    return _get_docker_containers()
+    return __get_docker_containers()
+
+
+def pull_image(repository):
+    try:
+        __pull_image(repository)
+    except:
+        return False
+    return True
 
 
 ##########################################################
 # helpers functions
 ##########################################################
-def _get_docker_images():
+def __get_docker_images():
     images = docker_engine.images.list()
     if len(images) <= 0:
         return []
@@ -29,7 +37,7 @@ def _get_docker_images():
     )
 
 
-def _get_docker_containers():
+def __get_docker_containers():
     containers = docker_engine.containers.list()
     if len(containers) <= 0:
         return []
@@ -44,3 +52,7 @@ def _get_docker_containers():
             containers,
         )
     )
+
+
+def __pull_image(repository):
+    docker_engine.images.pull(repository)
