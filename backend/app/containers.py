@@ -11,6 +11,10 @@ def get_docker_containers():
     return __get_docker_containers()
 
 
+def get_container_logs(containerName):
+    return __get_container_logs(containerName)
+
+
 def pull_image(repository):
     try:
         __pull_image(repository)
@@ -73,6 +77,12 @@ def __get_docker_containers():
             containers,
         )
     )
+
+
+def __get_container_logs(containerName):
+    container = docker_engine.containers.get(containerName)
+    container_logs = container.logs().decode()
+    return container_logs
 
 
 def __pull_image(repository):

@@ -24,6 +24,18 @@ const IndexPage = () => {
     return JSON.stringify({ type, data });
   };
 
+  const handleContainerLogs = (data) => {
+    const [containerName, encodedLog] = data.split("^");
+    const element = document.createElement("a");
+    const file = new Blob([atob(encodedLog)], {
+      type: "text/plain",
+    });
+    element.href = URL.createObjectURL(file);
+    element.download = containerName + ".log";
+    document.body.appendChild(element);
+    element.click();
+  };
+
   const handleTabChange = (event, newTabValue) => {
     setTabValue(newTabValue);
   };
@@ -50,6 +62,7 @@ const IndexPage = () => {
       const { type, data } = JSON.parse(message);
       if (type === "image-list") setImageList(data);
       else if (type === "container-list") setContainerList(data);
+      else if (type === "container-logs") handleContainerLogs(data);
       else if (type === "pull-image") setPullingImage(false);
     };
 

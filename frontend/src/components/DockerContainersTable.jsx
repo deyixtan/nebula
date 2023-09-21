@@ -9,6 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import {
+  DownloadOutlined,
   PauseCircleOutlineOutlined,
   PlayCircleOutline,
   StopCircleOutlined,
@@ -21,6 +22,10 @@ const DockerContainersTable = ({ containerList }) => {
 
   const craftMessage = (type, data) => {
     return JSON.stringify({ type, data });
+  };
+
+  const handleDownloadLogs = (containerName) => {
+    socket.send(craftMessage("container-logs", containerName));
   };
 
   const handleStopContainer = (containerName) => {
@@ -45,6 +50,7 @@ const DockerContainersTable = ({ containerList }) => {
             <TableCell>Image</TableCell>
             <TableCell>Ports</TableCell>
             <TableCell>Status</TableCell>
+            <TableCell>Logs</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -56,6 +62,13 @@ const DockerContainersTable = ({ containerList }) => {
               <TableCell>{container.containerImage}</TableCell>
               <TableCell>{JSON.stringify(container.containerPorts)}</TableCell>
               <TableCell>{container.containerStatus}</TableCell>
+              <TableCell>
+                <IconButton
+                  onClick={() => handleDownloadLogs(container.containerName)}
+                >
+                  <DownloadOutlined />
+                </IconButton>
+              </TableCell>
               <TableCell>
                 <IconButton
                   onClick={() => handleStopContainer(container.containerName)}

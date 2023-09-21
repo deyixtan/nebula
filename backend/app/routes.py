@@ -22,7 +22,7 @@ bp = Blueprint("bp", __name__)
 
 
 @sock.route("/ws")
-def echo(ws):
+def ws_handler(ws):
     while True:
         try:
             type, data = json.loads(ws.receive()).values()
@@ -30,6 +30,9 @@ def echo(ws):
                 ws.send(json.dumps({"type": type, "data": get_docker_images()}))
             elif type == "container-list":
                 ws.send(json.dumps({"type": type, "data": get_docker_containers()}))
+            elif type == "container-logs":
+                encoded_logs = b64encode(get_container_logs(data).encode()).decode()
+                ws.send(json.dumps({"type": type, "data": data + "^" + encoded_logs}))
             elif type == "pull-image":
                 pull_image(data)
                 ws.send(json.dumps({"type": type, "data": data}))
