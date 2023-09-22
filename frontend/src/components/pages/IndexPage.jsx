@@ -1,5 +1,17 @@
 import { useEffect, useState, useRef } from "react";
-import { Box, Button, Stack, Tab, TextField } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Input,
+  Stack,
+  Tab,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Rnd } from "react-rnd";
 import { VncScreen } from "react-vnc";
@@ -16,7 +28,9 @@ const IndexPage = () => {
   const [containerList, setContainerList] = useState([]);
   const [tabValue, setTabValue] = useState("1");
   const [pullRepository, setPullRepository] = useState("");
-  const [isPullingImage, setPullingImage] = useState(false);
+  const [buildAndImportRepository, setBuildAndImportRepository] =
+    useState(null);
+  const [isCreatingImage, setCreatingImage] = useState(false);
   const [vncUrl, setVncUrl] = useState("");
   const vncUrlTextFieldRef = useRef(null);
 
@@ -44,9 +58,30 @@ const IndexPage = () => {
     setPullRepository(event.target.value);
   };
 
+  const handleBuildAndImportRepository = (event) => {
+    setBuildAndImportRepository(event.target.files[0]);
+  };
+
   const handleClickPullRepository = () => {
-    setPullingImage(true);
+    setCreatingImage(true);
     socket.send(craftMessage("pull-image", pullRepository));
+  };
+
+  const handleClickImportBuildArchive = (event) => {
+    setCreatingImage(true);
+    const fileReader = new FileReader();
+    fileReader.readAsArrayBuffer(buildAndImportRepository);
+    fileReader.onload = (e) => {
+      const imageName = prompt(
+        "Please enter desired image name:",
+        "example:latest"
+      );
+      const content = {
+        imageName,
+        archive: btoa(new Uint8Array(e.target.result)),
+      };
+      socket.send(craftMessage("import-build-image", content));
+    };
   };
 
   const handleClickVncConnect = () => {
@@ -63,7 +98,8 @@ const IndexPage = () => {
       if (type === "image-list") setImageList(data);
       else if (type === "container-list") setContainerList(data);
       else if (type === "container-logs") handleContainerLogs(data);
-      else if (type === "pull-image") setPullingImage(false);
+      else if (type === "pull-image") setCreatingImage(false);
+      else if (type === "import-build-image") setCreatingImage(false);
     };
 
     setInterval(
@@ -99,23 +135,60 @@ const IndexPage = () => {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <Stack spacing="10px" marginBottom="50px">
-              <TextField
-                variant="outlined"
-                onChange={handleChangePullRepository}
-              />
-              <Button
-                variant="contained"
-                size="lg"
-                onClick={() => {
-                  handleClickPullRepository();
-                }}
-                disabled={isPullingImage === true}
-              >
-                Pull Image
-              </Button>
+            <Stack spacing="20px">
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                  <Typography>Get images from Docker Hub</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Stack spacing="20px">
+                    <Input
+                      variant="outlined"
+                      placeholder="hello-world:latest"
+                      onChange={handleChangePullRepository}
+                      disabled={isCreatingImage === true}
+                    />
+                    <Button
+                      variant="contained"
+                      size="lg"
+                      onClick={() => {
+                        handleClickPullRepository();
+                      }}
+                      disabled={isCreatingImage === true}
+                    >
+                      Pull Image
+                    </Button>
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                  <Typography>
+                    Import and build images from ZIP archive
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Stack spacing="20px">
+                    <Input
+                      inputProps={{ accept: "application/zip" }}
+                      type="file"
+                      onChange={handleBuildAndImportRepository}
+                      disabled={isCreatingImage === true}
+                      disableUnderline
+                    />
+                    <Button
+                      variant="contained"
+                      size="lg"
+                      onClick={handleClickImportBuildArchive}
+                      disabled={isCreatingImage === true}
+                    >
+                      Import and build image
+                    </Button>
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+              <DockerImagesTable imageList={imageList} />
             </Stack>
-            <DockerImagesTable imageList={imageList} />
           </TabPanel>
           <TabPanel value="2">
             <DockerContainersTable containerList={containerList} />

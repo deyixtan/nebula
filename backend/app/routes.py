@@ -1,6 +1,6 @@
 import json
 import requests
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from urllib.parse import urlencode
 from secrets import token_urlsafe
 from flask import (
@@ -36,6 +36,14 @@ def ws_handler(ws):
             elif type == "pull-image":
                 pull_image(data)
                 ws.send(json.dumps({"type": type, "data": data}))
+            elif type == "import-build-image":
+                image_name = data["imageName"]
+                raw_archive_data = b64decode(data["archive"]).decode("utf-8")
+                archive_data = bytearray(
+                    list(map(lambda x: int(x), raw_archive_data.split(",")))
+                )
+                import_build_image(image_name, archive_data)
+                ws.send(json.dumps({"type": type, "data": ""}))
             elif type == "remove-image":
                 remove_image(data)
             elif type == "run-image":

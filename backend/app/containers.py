@@ -1,4 +1,7 @@
 from docker import from_env
+from os import makedirs
+from shutil import unpack_archive
+from uuid import uuid4
 
 docker_engine = from_env()
 
@@ -21,6 +24,23 @@ def pull_image(repository):
     except:
         return False
     return True
+
+
+def import_build_image(image_name, archive_bytes):
+    random_id = uuid4().hex
+    file_path = "/tmp/nebula/uploads/" + random_id
+    makedirs(file_path, exist_ok=True)
+    makedirs(file_path + "/extract", exist_ok=True)
+
+    zip_path = file_path + "/archive.zip"
+    zip_archive = open(zip_path, "wb")
+    zip_archive.write(archive_bytes)
+    zip_archive.close()
+
+    extraction_path = file_path + "/extract"
+    unpack_archive(zip_path, extraction_path)
+
+    docker_engine.images.build(path=extraction_path, tag=image_name)
 
 
 def remove_image(imageName, force=True):
