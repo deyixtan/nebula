@@ -11,12 +11,10 @@ import "@fontsource/roboto/700.css";
 import "./main.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <React.Fragment>
-      <CssBaseline />
-      <AuthContextProvider>
-        <Router />
-      </AuthContextProvider>
-    </React.Fragment>
-  </React.StrictMode>
+  <React.Fragment>
+    <CssBaseline />
+    <AuthContextProvider>
+      <Router />
+    </AuthContextProvider>
+  </React.Fragment>
 );
